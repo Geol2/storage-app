@@ -1,0 +1,44 @@
+.folder-container {
+    background: #F5F5F5;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.index-container {
+    margin: 70px 70px 10px 52px;
+}
+
+.folder-search-container {
+    background-color: #FAFAFA;
+    margin: 0 50px 50px 50px;
+    width: 93%;
+    box-shadow: 3px 3px 5px gray;
+}
+
+.folder-search-container .search-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.folder-search-container .search {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.a-class {
+    text-decoration: none;
+    color: #1890FF;
+}
+
+.folder-in-name {
+    width: 80%;
+    text-align: left;
+    background: #FAFAFA;
+}
+
+.folder-in-name span {
+    margin-left: 20px;
+    margin-right: 20px;
+}
