@@ -2,9 +2,39 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Storage</title>
+  <title>Storage-app</title>
 </head>
+
 <body>
+<div class="login-container">
+  <img class="login-img" src=""/>
+  <form method="post" class="flex vertical-center" id="login" action="/login">
+    <div class="m-10">
+      <label class="m-10 roboto" for="uid">ID</label><br>
+      <input type="text" id="uid" name="uid" class="m-10 noto-sans-kr"
+             value="" placeholder="아이디"
+             autocomplete="off"/><br>
+      <label class="m-10 roboto" for="pwd">PASSWORD</label><br>
+      <input type="password" id="pwd" name="pwd" class="m-10 noto-sans-kr"
+             value="" placeholder="비밀번호"
+             autocomplete="off"/><br>
+      <button class="login-btn m-10 noto-sans-kr" id="main-login">로그인</button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript" nonce="{{ $_SERVER['CSP_TOKEN'] }}">
+  let loginButton = document.getElementById('main-login');
+
+  loginButton.addEventListener('click', function () {
+    spinner.style.display = 'block';
+
+    setTimeout(() => {
+      spinner.style.display = 'none';
+      loginButton.submit();
+    }, 1000);
+  });
+</script>
 
 </body>
 </html>

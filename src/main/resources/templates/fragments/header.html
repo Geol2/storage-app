@@ -1,22 +1,17 @@
-<?php
-
-use App\Helpers\Csp;
-
-?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
     <head>
-        <title>Zero Storage</title>
+        <title>storage-app</title>
 
         <meta charset="UTF-8" />
         <meta http-equiv="Content-Security-Policy"
               content="default-src 'self';
-              img-src 'self';
-              script-src 'self' 'nonce-{{ Csp::csp_token()  }}' https://code.jquery.com;
-              font-src 'self' fonts.gstatic.com;
-              style-src 'self' fonts.googleapis.com;
-              form-action 'self'">
+          img-src 'self';
+          script-src 'self' 'nonce-{{ Csp::csp_token()  }}' https://code.jquery.com;
+          font-src 'self' fonts.gstatic.com;
+          style-src 'self' fonts.googleapis.com;
+          form-action 'self'">
         <meta http-equiv="pragma" content="no-cache"/>
         <meta http-equiv="Expires" content="0"/>
         <meta http-equiv="Cache-Control" content="no-cache"/>
@@ -43,7 +38,7 @@ use App\Helpers\Csp;
                 crossorigin="anonymous"></script>
     </head>
 
-    <body class="flex-wrap">
+    <div class="flex-wrap">
         <div class="header-container">
             <div class="logo">
                 <span class="roboto">Z</span>
@@ -51,15 +46,15 @@ use App\Helpers\Csp;
 
             <div class="flex center">
                 <span class="roboto">
-                    <a class="main-name" href="/">Zero Storage</a>
+                    <a class="main-name" href="/static">Zero Storage</a>
                 </span>
             </div>
 
             <div class="left noto-sans-kr">
                 @if( !empty($login) )
-                    <a class="header-a" id="logout">로그아웃</a>
+                <a class="header-a" id="logout">로그아웃</a>
                 @else
-                    <a class="header-a" id="login">로그인</a>
+                <a class="header-a" id="login">로그인</a>
                 @endif
             </div>
 
@@ -67,37 +62,5 @@ use App\Helpers\Csp;
                 <img src="/img/spinner.gif" alt="use spinner"/>
             </div>
         </div>
-
-        <script type="text/javascript" nonce="{{ $_SERVER['CSP_TOKEN']  }}">
-            @if( !empty($login) )
-            let logoutElement = document.getElementById("logout");
-
-            logoutElement.addEventListener('click', function () {
-                logout();
-            });
-
-            function logout() {
-                spinner.style.display = 'block';
-
-                setTimeout(() => {
-                    spinner.style.display = 'none';
-                    location.href = '/logout';
-                }, 500);
-            }
-            @else
-            let loginElement = document.getElementById("login");
-
-            loginElement.addEventListener('click', function () {
-                login();
-            });
-
-            function login() {
-                spinner.style.display = 'block';
-
-                setTimeout(() => {
-                    spinner.style.display = 'none';
-                    location.href = '/';
-                }, 500);
-            }
-            @endif
-        </script>
+    </div>
+</html>
