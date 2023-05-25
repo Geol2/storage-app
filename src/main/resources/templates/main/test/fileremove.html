@@ -1,0 +1,47 @@
+<div>
+    <form action="/api/delete" name="file-form" id="file-form" method="post" enctype="multipart/form-data" >
+        <label for="bucket">버킷 : </label>
+        <input type="text" name="bucket" id="bucket" value="cashmoa" />
+
+        <label for="stoken">토큰 : </label>
+        <input type="text" name="stoken" id="stoken" value="VJ0PHc8YQvEPykL" />
+
+        <label for="path">파일 : </label>
+        <input type="text" name="path" id="path" value="qu3CiPuBXD/test/xyz.txt" />
+
+        <!-- <button type="submit"> 확인 </button> -->
+        <!-- action : https://zerostorage.zdev.co.kr/api/delete -->
+    </form>
+    <button id="submit">확인</button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+        crossorigin="anonymous"></script>
+<script type="text/javascript">
+    let submit = document.getElementById('submit');
+
+    submit.addEventListener('click', function () {
+        let fileFormElement = document.getElementById("file-form");
+        let data = new FormData(fileFormElement);
+
+        $.ajax({
+            url: "/api/delete",
+            method: 'POST',
+            data: data,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if(data.res_code === 200) {
+                    alert("삭제되었습니다.");
+                } else {
+                    alert("삭제 실패입니다.");
+                }
+            },
+            error: function (xhr, res, error) {
+                alert("error");
+            }
+        });
+    });
+</script>

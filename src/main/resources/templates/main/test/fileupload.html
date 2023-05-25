@@ -1,0 +1,46 @@
+<div>
+    <form action="/api/upload" name="file-form" id="file-form" method="post" enctype="multipart/form-data" >
+        <label for="bucket">버킷 : </label>
+        <input type="text" name="bucket" id="bucket" value="cashmoa" />
+
+        <label for="stoken">토큰 : </label>
+        <input type="text" name="stoken" id="stoken" value="VJ0PHc8YQvEPykL" />
+
+        <label for="folder">폴더이름 : </label>
+        <input type="text" name="folder" id="folder" value="test" /><br><br>
+
+        <label for="file_data">파일 : </label>
+        <input type="file" name="file_data" id="file_data" class="file_data" value="" />
+
+        <!--<button type="submit"> 확인 </button> form Submit -->
+        <!-- action: https://zerostorage.zdev.co.kr/api/upload -->
+    </form>
+    <button id="submit"> 확인 </button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+        crossorigin="anonymous"></script>
+<script type="text/javascript">
+    let submit = document.getElementById('submit');
+
+    submit.addEventListener('click', function () {
+        let fileFormElement = document.getElementById("file-form");
+        let data = new FormData(fileFormElement);
+
+        $.ajax({
+            url: "/api/upload",
+            method: 'POST',
+            data: data,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                alert("업로드 경로 : " + data.file_url );
+            },
+            error: function (xhr, res, error) {
+                alert("error");
+            }
+        });
+    });
+</script>

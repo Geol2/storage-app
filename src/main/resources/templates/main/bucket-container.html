@@ -1,0 +1,312 @@
+<div class="bucket-container">
+    <div class="search-container">
+        <div class="search-top">
+            <div class="search roboto">
+                <h5 class="content-name">
+                    BUCKET
+                    <span class="count-color">({{ $bucketList['totalBucketCount'] }})</span>
+                </h5>
+            </div>
+            <div>
+                <button class="update-delete-btn" id="update"><span>수정</span></button>
+                <button class="update-delete-btn" id="delete">삭제</button>
+                <button class="add-btn" id="add"> + Add New</button>
+            </div>
+        </div>
+
+        <div class="search-list">
+            <table class="search-table roboto">
+                <thead class="thead">
+                <tr>
+                    <th class="th"></th>
+                    <th class="th name noto-sans-kr">이름</th>
+                    <th class="th folder-name noto-sans-kr f-16">실제 폴더명</th>
+                    <th class="th file-count noto-sans-kr">총 파일 갯수</th>
+                    <th class="th folder-count noto-sans-kr">총 폴더 갯수</th>
+                    <th class="th security-token">Security Token</th>
+                    <th class="th create-date noto-sans-kr">생성날짜</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ( $bucketList['page'] as $key => $value)
+                    <tr class="row">
+                        <td class="col on-radio-click">
+                            <label for="radio-btn"></label>
+                            <input type="radio" class="radio-btn" id="radio-btn"
+                                   name="radio-selected" value="{{ $value->bucket_name }}"
+                                    {{ $key === 0 ? "checked" : ""}} />
+                        </td>
+                        <td class="col name on-bucket">
+                            <span>{{ $value->bucket_name }}</span>
+                        </td>
+                        <td class="col folder-name">
+                            <span>{{ $value->folder_name }}</span>
+                        </td>
+                        <td class="col file-count">
+                            <span>0 (미정)</span>
+                        </td>
+                        <td class="col folder-count">
+                            <span>0 (미정)</span>
+                        </td>
+                        <td class="col security-token">
+                            <span>{{ $value->security_token }}</span>
+                        </td>
+                        <td class="col create-date">
+                            <span>{{ $value->created_at }}</span>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="paging">
+
+            <label for="per-page"></label>
+            <select id="per-page" class="per-page roboto" name="per-page">
+                <option value="10" {{ $perPage == 10 ? "selected" : "" }}> 10/page</option>
+                <option value="25" {{ $perPage == 25 ? "selected" : "" }}> 25/page</option>
+                <option value="50" {{ $perPage == 50 ? "selected" : "" }}> 50/page</option>
+                <option value="100" {{ $perPage == 100 ? "selected" : "" }}> 100/page</option>
+            </select>
+
+            {{ $bucketList['page']->appends(request()->input())->onEachSide(1)->links('vendor.pagination.default') }}
+
+            @if ( $bucketList['totalBucketCount'] != 0 )
+                <div class="items roboto">
+                    {{ $bucketList['currentFirst'] }} - {{ $bucketList['currentLast'] }}
+                    of {{ $bucketList['totalBucketCount'] }} items
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<dialog id="add-dialog">
+    <h5 class="title-dialog noto-sans-kr f-16">새로 만들기</h5>
+    <form class="form-dialog" id="create-form-dialog" method="post" action="/bucket">
+        @csrf
+        <div class="flex flex-column">
+            <label for="bucket-name">버킷 이름</label>
+            <input type="search" name="bucket-name" id="bucket-name" class="bucket-name noto-sans-kr"
+                   value="" placeholder="고유 이름을 입력해주세요 (최대 30자까지)" maxlength="30" required/>
+        </div>
+    </form>
+    <div class="flex center m-10">
+        <button id="add-cancel-btn" value="cancel">취소</button>
+        <button id="add-confirm-btn" value="add-confirm">만들기</button>
+    </div>
+</dialog>
+
+<dialog id="delete-dialog">
+    <div class="mt-20 flex">
+        <img class="dialog-warning" src="/img/warning.svg" alt="warning"/>
+        <div class="flex flex-column">
+            <h5 class="noto-sans-kr f-16">정말 삭제하시겠습니까?</h5>
+        </div>
+    </div>
+    <button class="float-right delete-confirm-btn" id="delete-confirm-btn">삭제하기</button>
+    <button class="float-right cancel-btn" id="delete-cancel-btn">닫기</button>
+</dialog>
+
+<dialog id="update-dialog">
+    <h5 class="title-dialog noto-sans-kr f-16">수정하기</h5>
+    <form class="form-dialog" id="update-bucket-form">
+        <div class="flex flex-column">
+            <label for="update-bucket-name">버킷 이름</label>
+            <input type="search" name="update-bucket-name" id="update-bucket-name" class="bucket-name noto-sans-kr"
+                   value="" placeholder="변경할 이름을 입력해주세요 (최대 30자까지)" maxlength="30" required/>
+        </div>
+    </form>
+    <div class="flex center m-10">
+        <button id="update-cancel-btn" value="cancel">취소</button>
+        <button id="update-confirm-btn" value="update-confirm">수정하기</button>
+    </div>
+</dialog>
+
+<script type="text/javascript" nonce="{{ $_SERVER['CSP_TOKEN'] }}">
+    let addDiaLog = document.getElementById('add-dialog');           // 버킷 추가
+    let addListener = document.getElementById('add');
+    let addCancelButton = document.getElementById('add-cancel-btn');
+    let addEvent = document.getElementById('add-confirm-btn');
+
+    let deleteDiaLog = document.getElementById('delete-dialog');      // 버킷 삭제
+    let deleteListener = document.getElementById('delete');
+    let deleteCancelButton = document.getElementById('delete-cancel-btn');
+    let deleteEvent = document.getElementById('delete-confirm-btn');
+
+    let updateDiaLog = document.getElementById('update-dialog');      // 버킷 수정
+    let updateListener = document.getElementById('update');
+    let updateCancelButton = document.getElementById('update-cancel-btn');
+    let updateEvent = document.getElementById('update-confirm-btn');
+
+    let spinner = document.getElementById('spinner');
+
+    /* 추가 모달 */
+    addListener.addEventListener('click', function () {
+        spinner.style.display = 'block';
+
+        setTimeout(() => {
+            spinner.style.display = 'none';
+            addDiaLog.showModal();
+        }, 500);
+    });
+
+    /* 추가 모달을 닫았을 때 */
+    addCancelButton.addEventListener('click', function () {
+        document.getElementById("bucket-name").value = '';
+        addDiaLog.close();
+    });
+
+    /* 추가 모달에서 버킷 추가 */
+    addEvent.addEventListener('click', function () {
+        let formDialog = document.getElementById('create-form-dialog');
+        formDialog.submit();
+    });
+
+    /* 삭제 모달 열기 */
+    deleteListener.addEventListener('click', function () {
+        spinner.style.display = 'block';
+
+        setTimeout(() => {
+            spinner.style.display = 'none';
+            deleteDiaLog.showModal();
+        }, 500);
+    });
+
+    /* 삭제 모달 닫기 */
+    deleteCancelButton.addEventListener('click', function () {
+        deleteDiaLog.close();
+    });
+
+    /* 삭제 모달 삭제완료 */
+    deleteEvent.addEventListener('click', async function () {
+        let checkedBucketNameElement = document.querySelector("input[name='radio-selected']:checked");
+        if (checkedBucketNameElement === null) {
+            alert("삭제할 버킷을 선택해주세요.");
+            return;
+        }
+        let checkedBucketName = document.querySelector("input[name='radio-selected']:checked").value;
+
+        $.ajax({
+            url: "/bucket/" + checkedBucketName,
+            method: "DELETE"
+        })
+            .done(function (data) {
+                // HTTP 요청이 성공하면 요청한 데이터가 done() 메소드로 전달됨.
+                alert(data.message);
+                location.reload();
+            })
+            .fail(function (xhr, status, errorThrown) {
+                // HTTP 요청이 실패
+                alert("시스템 문제로 삭제처리가 실패되었습니다.");
+            })
+            .always(function (xhr, status) {
+                //
+            });
+    });
+
+    /* 수정 모달창 */
+    updateListener.addEventListener('click', function () {
+        spinner.style.display = 'block';
+
+        setTimeout(() => {
+            spinner.style.display = 'none';
+
+            let checkedBucketNameElement = document.querySelector("input[name='radio-selected']:checked");
+            if (checkedBucketNameElement === null) {
+                alert("수정할 버킷을 선택해주세요.");
+                return;
+            }
+
+            let checkedBucketName = document.querySelector("input[name='radio-selected']:checked").value;
+            document.getElementById('update-bucket-name').value = checkedBucketName;
+
+            updateDiaLog.showModal();
+        }, 500);
+    });
+
+    /* 수정 모달 취소 */
+    updateCancelButton.addEventListener('click', function () {
+        updateDiaLog.close();
+    });
+
+    /* 수정 모달 수정하기 클릭 */
+    updateEvent.addEventListener('click', async function () {
+        let checkedBucketName = document.querySelector("input[name='radio-selected']:checked").value;
+        let updateData = document.getElementById('update-bucket-form');
+        let data = new FormData(updateData);
+
+        $.ajax({
+            url: "/bucket/" + checkedBucketName,
+            method: "POST",
+            data: data,
+            contentType: false,
+            processData: false,
+        })
+            .done(function (data) {
+                // HTTP 요청이 성공하면 요청한 데이터가 done() 메소드로 전달됨.
+                alert(data.message);
+                location.reload();
+            })
+            .fail(function (xhr, status, errorThrown) {
+                // HTTP 요청이 실패
+                alert("시스템 문제로 수정이 실패되었습니다.");
+            })
+            .always(function (xhr, status) {
+                //
+            });
+    });
+
+    // 버킷 이름 선택 시..
+    let onBucketList = document.getElementsByClassName("on-bucket");
+    for (let i = 0; i < onBucketList.length; i++) {
+        onBucketList[i].addEventListener('click', function (event) {
+            let clickedBucketName = event.currentTarget.children[0].innerText;
+            onBucket(clickedBucketName);
+        });
+    }
+
+    let folderNameList = document.getElementsByClassName("folder-name");
+    for (let i = 0; i < folderNameList.length; i++) {
+        folderNameList[i].addEventListener('click', function (event) {
+            let folderName = event.currentTarget.children[0].innerText;
+            onCopy(folderName);
+        });
+    }
+
+    let securityTokenList = document.getElementsByClassName("security-token");
+    for (let i = 0; i < securityTokenList.length; i++) {
+        securityTokenList[i].addEventListener('click', function (event) {
+            let securityTokenName = event.currentTarget.children[0].innerText;
+            onCopy(securityTokenName);
+        });
+    }
+
+    function onBucket(bucketName) {
+        location.href = '/bucket/' + bucketName;
+    }
+
+    function onCopy(str) {
+        navigator.clipboard.writeText(str);
+        alert("복사되었습니다.");
+    }
+
+    // 라디오 버튼 영역 선택하기
+    let onRadioList = document.getElementsByClassName("on-radio-click");
+    for (let i = 0; i < onRadioList.length; i++) {
+        onRadioList[i].addEventListener('click', function (event) {
+            event.cancelBubble = true;
+
+            event.currentTarget.children[1].checked = true;
+        });
+    }
+
+    let perPageSelectElement = document.getElementById("per-page");
+    perPageSelectElement.addEventListener("change", function() {
+        let perPage = document.getElementById("per-page").value;
+        let data = perPage;
+
+        location.href = "/dashboard?perPage=" + data;
+    });
+</script>

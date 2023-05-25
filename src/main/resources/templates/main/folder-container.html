@@ -1,0 +1,291 @@
+<div class="folder-container">
+    <div class="index-container">
+        <a class="a-class f-14" href="/"> BUCKET </a>
+        >
+        <a class="a-class f-14" href="/bucket/{{ $bucketName }}"> {{ $bucketName }}</a>
+    </div>
+
+    <div class="folder-search-container">
+        <div class="search-top">
+            <div class="search roboto">
+                <h5 class="content-name noto-sans-kr">
+                    폴더
+                    <span class="count-color">({{ $folderList['totalFolderCount'] }})</span>
+                </h5>
+            </div>
+            <div >
+                @if ( $folderList['totalFolderCount'] > 0 )
+                    <button class="update-delete-btn" id="update"><span>수정</span></button>
+                    <button class="update-delete-btn" id="delete">삭제</button>
+                @endif
+                <button class="add-btn" id="add"> + Add New </button>
+            </div>
+        </div>
+        <div class="search-list">
+            <table class="search-table roboto">
+                <thead class="thead">
+                    <tr>
+                        <th class="th"> </th>
+                        <th class="th folder-in-name noto-sans-kr">
+                            <span> 이름 </span>
+                        </th>
+                        <th class="th create-date noto-sans-kr">
+                            <span> 생성날짜 </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ( $folderList['page'] as $key => $value)
+                        <tr class="row">
+                            <td class="col on-radio-click">
+                                <label for="radio-btn"></label>
+                                <input type="radio" id="radio-btn" name="radio-selected"
+                                       class="radio-btn" value="{{ $value->folder_name }}"
+                                        {{$key == 0 ? "checked" : "" }}/>
+                            </td>
+                            <td class="col">
+                                <span> /{{$value->folder_name}} </span>
+                            </td>
+                            <td class="col">
+                                <span> {{$value->created_at}} </span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="paging">
+
+            <label for="per-page"></label>
+            <select id="per-page" class="per-page roboto" name="per-page">
+                <option value="10" {{ $perPage == 10 ? "selected" : "" }}> 10/page</option>
+                <option value="25" {{ $perPage == 25 ? "selected" : "" }}> 25/page</option>
+                <option value="50" {{ $perPage == 50 ? "selected" : "" }}> 50/page</option>
+                <option value="100" {{ $perPage == 100 ? "selected" : "" }}> 100/page</option>
+            </select>
+
+            {{ $folderList['page']->appends(request()->input())->onEachSide(1)->links('vendor.pagination.default') }}
+
+            @if ( $folderList['totalFolderCount'] != 0 )
+                <div class="items roboto">
+                    {{ $folderList['currentFirst'] }} - {{ $folderList['currentLast'] }} of {{ $folderList['totalFolderCount'] }} items
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+<dialog id="add-dialog">
+    <h5 class="title-dialog noto-sans-kr f-16">새로 만들기</h5>
+    <form class="form-dialog" id="create-form-dialog">
+        @csrf
+        <div class="flex flex-column">
+            <label for="folder-name">폴더 이름</label>
+            <input type="search" name="folder-name" id="folder-name" class="folder-name noto-sans-kr"
+                   value="" placeholder="고유 폴더 이름을 입력해주세요 (최대 20자 까지)" maxlength="20" required />
+        </div>
+    </form>
+    <div class="flex center m-10">
+        <button id="add-cancel-btn" value="cancel">취소</button>
+        <button id="add-confirm-btn" value="add-confirm">만들기</button>
+    </div>
+</dialog>
+
+<dialog id="delete-dialog">
+    <div class="mt-20 flex">
+        <img class="dialog-warning" src="/img/warning.svg" alt="warning" />
+        <div class="flex flex-column">
+            <h5 class="noto-sans-kr f-16">정말 삭제하시겠습니까?</h5>
+        </div>
+    </div>
+    <button class="float-right delete-confirm-btn" id="delete-confirm-btn">삭제하기</button>
+    <button class="float-right cancel-btn" id="delete-cancel-btn">닫기</button>
+</dialog>
+
+<dialog id="update-dialog">
+    <h5 class="title-dialog noto-sans-kr f-16">수정하기</h5>
+    <form class="form-dialog" id="update-folder-form">
+        <div class="flex flex-column">
+            <label for="update-folder-name">폴더 이름</label>
+            <input type="search" name="update-folder-name" id="update-folder-name" class="folder-name noto-sans-kr"
+                   value="" placeholder="변경할 이름을 입력해주세요 (최대 20자 까지)" maxlength="20" required />
+        </div>
+    </form>
+    <div class="flex center m-10">
+        <button id="update-cancel-btn" value="cancel">취소</button>
+        <button id="update-confirm-btn" value="update-confirm">수정하기</button>
+    </div>
+</dialog>
+
+<script type="text/javascript" nonce="{{ $_SERVER['CSP_TOKEN'] }}">
+
+    window.onload = function () {
+        let bucketName = '{{ $bucketName }}';
+
+        let addDiaLog = document.getElementById('add-dialog');           // 폴더 추가
+        let addListener = document.getElementById('add');
+        let addCancelButton = document.getElementById('add-cancel-btn');
+        let addEvent = document.getElementById('add-confirm-btn');
+
+        let deleteDiaLog = document.getElementById('delete-dialog');      // 폴더 삭제
+        let deleteListener = document.getElementById('delete');
+        let deleteCancelButton = document.getElementById('delete-cancel-btn');
+        let deleteEvent = document.getElementById('delete-confirm-btn');
+
+        let updateDiaLog = document.getElementById('update-dialog');      // 폴더 수정
+        let updateListener = document.getElementById('update');
+        let updateCancelButton = document.getElementById('update-cancel-btn');
+        let updateEvent = document.getElementById('update-confirm-btn');
+
+        let spinner = document.getElementById('spinner');
+
+        /* 폴더 추가 모달 */
+        addListener.addEventListener('click', function () {
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                addDiaLog.showModal();
+            }, 500);
+        });
+
+        /* 폴더 추가 모달 닫기 */
+        addCancelButton.addEventListener('click', function () {
+            document.getElementById("folder-name").value = '';
+            addDiaLog.close();
+        });
+
+        /* 추가 모달에서 폴더 추가 */
+        addEvent.addEventListener('click', function () {
+            let formDialog = document.getElementById('create-form-dialog');
+            let folderName = document.getElementById('folder-name').value;
+            let data = {
+                folderName: folderName
+            };
+
+            $.ajax({
+                url: "/folder/" + bucketName,
+                method: "POST",
+                data: data
+            })
+                .done(function (data) {
+                    // HTTP 요청이 성공하면 요청한 데이터가 done() 메소드로 전달됨.
+                    alert(data.message);
+                    location.reload();
+                })
+                .fail(function (xhr, status, errorThrown) {
+                    // HTTP 요청이 실패
+                    alert("시스템 문제로 삭제처리가 실패되었습니다.");
+                })
+                .always(function (xhr, status) {
+                    //
+                });
+        });
+
+        /* 삭제 모달 열기 */
+        deleteListener.addEventListener('click', function () {
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                deleteDiaLog.showModal();
+            }, 500);
+        });
+
+        /* 삭제 모달 닫기 */
+        deleteCancelButton.addEventListener('click', function () {
+            deleteDiaLog.close();
+        });
+
+        /* 삭제 모달 삭제완료 */
+        deleteEvent.addEventListener('click', async function () {
+            let checkedFolderName = document.querySelector("input[name='radio-selected']:checked").value;
+            if (checkedFolderName == null) {
+                alert("삭제할 폴더를 선택해주세요.");
+                location.reload();
+                return;
+            }
+
+            $.ajax({
+                url: "/folder/{{ $bucketName }}/" + checkedFolderName,
+                method: "DELETE"
+            })
+                .done(function (data) {
+                    // HTTP 요청이 성공하면 요청한 데이터가 done() 메소드로 전달됨.
+                    alert(data.message);
+                    location.reload();
+                })
+                .fail(function (xhr, status, errorThrown) {
+                    // HTTP 요청이 실패
+                    alert("시스템 문제로 삭제처리가 실패되었습니다.");
+                })
+                .always(function (xhr, status) {
+                    //
+                });
+        });
+
+        /* 수정 모달창 */
+        updateListener.addEventListener('click', function () {
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                let checkedFolderName = document.querySelector("input[name='radio-selected']:checked").value;
+                document.getElementById('update-folder-name').value = checkedFolderName;
+
+                updateDiaLog.showModal();
+            }, 500);
+        });
+
+        /* 수정 모달 취소 */
+        updateCancelButton.addEventListener('click', function () {
+            updateDiaLog.close();
+        });
+
+        /* 수정 모달 수정하기 클릭 */
+        updateEvent.addEventListener('click', async function () {
+            let folderName = document.querySelector("input[name='radio-selected']:checked").value;
+            let updateForm = document.getElementById("update-folder-form");
+            let data = new FormData(updateForm);
+
+            $.ajax({
+                url: "/folder/{{ $bucketName }}/" + folderName,
+                method: "POST",
+                data: data,
+                contentType: false,
+                processData: false,
+            })
+                .done(function (data) {
+                    // HTTP 요청이 성공하면 요청한 데이터가 done() 메소드로 전달됨.
+                    alert(data.message);
+                    location.reload();
+                })
+                .fail(function (xhr, status, errorThrown) {
+                    // HTTP 요청이 실패
+                    alert("시스템 문제로 수정이 실패되었습니다.");
+                })
+                .always(function (xhr, status) {
+                    //
+                });
+        });
+    }
+
+    let perPageSelectElement = document.getElementById("per-page");
+    perPageSelectElement.addEventListener("change", function() {
+        let perPage = document.getElementById("per-page").value;
+        let data = perPage;
+
+        location.href = "/bucket/{{ $bucketName }}?perPage=" + data;
+    });
+
+    // 라디오 버튼 영역 선택하기
+    let onRadioList = document.getElementsByClassName("on-radio-click");
+    for (let i = 0; i < onRadioList.length; i++) {
+        onRadioList[i].addEventListener('click', function (event) {
+            event.cancelBubble = true;
+
+            event.currentTarget.children[1].checked = true;
+        });
+    }
+</script>
