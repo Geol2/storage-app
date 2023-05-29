@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       lang="en">
-    <head th:fragment="header">
+    <head th:fragment="head">
         <title>storage-app</title>
 
         <meta charset="UTF-8" />
@@ -23,13 +23,13 @@
         <link rel="stylesheet" href="/css/login.css" />
         <link rel="stylesheet" href="/css/dialog.css" />
 
-        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"
                 crossorigin="anonymous"></script>
     </head>
 
-    <div class="flex-wrap">
+    <div th:fragment="header" class="flex-wrap">
         <div class="header-container">
             <div class="logo">
                 <span class="roboto"></span>
@@ -37,12 +37,12 @@
 
             <div class="flex center">
                 <span class="roboto">
-                    <a class="main-name" href="/static">Storage</a>
+                    <a class="main-name" href="/">Storage</a>
                 </span>
             </div>
 
             <div class="left noto-sans-kr">
-                <a class="header-a" id="logout">로그아웃</a>
+                <!-- <a class="header-a" id="logout">로그아웃</a> -->
                 <a class="header-a" id="login">로그인</a>
             </div>
 
