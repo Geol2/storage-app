@@ -11,6 +11,6 @@ public class LoginController {
         String userId = request.getParameter("uid");
         String passWd = request.getParameter("pwd");
 
-
+        
     }
 }
