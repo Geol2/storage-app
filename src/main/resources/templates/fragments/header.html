@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       lang="en">
     <head th:fragment="head">
-        <title>storage-app</title>
+        <title>Images</title>
 
         <meta charset="UTF-8" />
         <meta http-equiv="pragma" content="no-cache"/>
@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="/css/common.css" />
         <link rel="stylesheet" href="/css/header.css" />
         <link rel="stylesheet" href="/css/sidenav.css" />
-        <link rel="stylesheet" href="/css/bucket.css" />
+        <link rel="stylesheet" href="/css/main.css" />
         <link rel="stylesheet" href="/css/folder.css" />
         <link rel="stylesheet" href="/css/login.css" />
         <link rel="stylesheet" href="/css/dialog.css" />
@@ -37,13 +37,13 @@
 
             <div class="flex center">
                 <span class="roboto">
-                    <a class="main-name" href="/">Storage</a>
+                    <a class="main-name" href="/">Images</a>
                 </span>
             </div>
 
             <div class="left noto-sans-kr">
                 <!-- <a class="header-a" id="logout">로그아웃</a> -->
-                <a class="header-a" th:href="@{/login}" id="login">로그인</a>
+                <!-- <a class="header-a" th:href="@{/login}" id="login">로그인</a> -->
             </div>
 
             <div id="spinner">
