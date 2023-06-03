@@ -6,12 +6,18 @@
 <div class="main-container">
   <div class="container center h-100-per">
 
-    <label for="file-upload" class="file-upload-button">
-      공유하고 싶은 파일을 게시해주세요.
-    </label>
-    <input type="file" name="file-upload" id="file-upload" class="file-container" />
-
+    <form method="post" enctype="multipart/form-data" th:action="@{/upload}">
+      <label for="file-upload" class="file-upload-button">
+        공유하고 싶은 파일을 게시해주세요.
+      </label>
+      <input type="file" name="file-upload" id="file-upload" class="file-container" />
+      <button type="submit">확인</button>
+    </form>
   </div>
 </div>
+
+<script>
+
+</script>
 </body>
 </html>
