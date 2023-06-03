@@ -4,7 +4,7 @@
             <div class="search roboto">
                 <h5 class="content-name">
                     BUCKET
-                    <span class="count-color">({{ $bucketList['totalBucketCount'] }})</span>
+                    <span class="count-color">( )</span>
                 </h5>
             </div>
             <div>
@@ -28,19 +28,17 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ( $bucketList['page'] as $key => $value)
                     <tr class="row">
                         <td class="col on-radio-click">
                             <label for="radio-btn"></label>
                             <input type="radio" class="radio-btn" id="radio-btn"
-                                   name="radio-selected" value="{{ $value->bucket_name }}"
-                                    {{ $key === 0 ? "checked" : ""}} />
+                                   name="radio-selected" value="" />
                         </td>
                         <td class="col name on-bucket">
-                            <span>{{ $value->bucket_name }}</span>
+                            <span></span>
                         </td>
                         <td class="col folder-name">
-                            <span>{{ $value->folder_name }}</span>
+                            <span></span>
                         </td>
                         <td class="col file-count">
                             <span>0 (미정)</span>
@@ -49,13 +47,12 @@
                             <span>0 (미정)</span>
                         </td>
                         <td class="col security-token">
-                            <span>{{ $value->security_token }}</span>
+                            <span></span>
                         </td>
                         <td class="col create-date">
-                            <span>{{ $value->created_at }}</span>
+                            <span></span>
                         </td>
                     </tr>
-                @endforeach
                 </tbody>
             </table>
         </div>
@@ -64,20 +61,15 @@
 
             <label for="per-page"></label>
             <select id="per-page" class="per-page roboto" name="per-page">
-                <option value="10" {{ $perPage == 10 ? "selected" : "" }}> 10/page</option>
-                <option value="25" {{ $perPage == 25 ? "selected" : "" }}> 25/page</option>
-                <option value="50" {{ $perPage == 50 ? "selected" : "" }}> 50/page</option>
-                <option value="100" {{ $perPage == 100 ? "selected" : "" }}> 100/page</option>
+                <option value="10"> 10/page</option>
+                <option value="25"> 25/page</option>
+                <option value="50"> 50/page</option>
+                <option value="100"> 100/page</option>
             </select>
 
-            {{ $bucketList['page']->appends(request()->input())->onEachSide(1)->links('vendor.pagination.default') }}
+            <div class="items roboto">
 
-            @if ( $bucketList['totalBucketCount'] != 0 )
-                <div class="items roboto">
-                    {{ $bucketList['currentFirst'] }} - {{ $bucketList['currentLast'] }}
-                    of {{ $bucketList['totalBucketCount'] }} items
-                </div>
-            @endif
+            </div>
         </div>
     </div>
 </div>
@@ -88,8 +80,10 @@
         @csrf
         <div class="flex flex-column">
             <label for="bucket-name">버킷 이름</label>
-            <input type="search" name="bucket-name" id="bucket-name" class="bucket-name noto-sans-kr"
-                   value="" placeholder="고유 이름을 입력해주세요 (최대 30자까지)" maxlength="30" required/>
+            <input type="search" name="bucket-name" id="bucket-name"
+                   class="bucket-name noto-sans-kr"
+                   value="" placeholder="고유 이름을 입력해주세요 (최대 30자까지)"
+                   maxlength="30" required/>
         </div>
     </form>
     <div class="flex center m-10">
@@ -114,8 +108,10 @@
     <form class="form-dialog" id="update-bucket-form">
         <div class="flex flex-column">
             <label for="update-bucket-name">버킷 이름</label>
-            <input type="search" name="update-bucket-name" id="update-bucket-name" class="bucket-name noto-sans-kr"
-                   value="" placeholder="변경할 이름을 입력해주세요 (최대 30자까지)" maxlength="30" required/>
+            <input type="search" name="update-bucket-name" id="update-bucket-name"
+                   class="bucket-name noto-sans-kr"
+                   value="" placeholder="변경할 이름을 입력해주세요 (최대 30자까지)"
+                   maxlength="30" required/>
         </div>
     </form>
     <div class="flex center m-10">
@@ -124,7 +120,7 @@
     </div>
 </dialog>
 
-<script type="text/javascript" nonce="{{ $_SERVER['CSP_TOKEN'] }}">
+<script type="text/javascript">
     let addDiaLog = document.getElementById('add-dialog');           // 버킷 추가
     let addListener = document.getElementById('add');
     let addCancelButton = document.getElementById('add-cancel-btn');

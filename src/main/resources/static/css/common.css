@@ -140,6 +140,11 @@ table {
     padding: 10px;
 }
 
+/* height */
+.h-100-per {
+    height: 100%;
+}
+
 /* paging */
 .paging {
     display: flex;
