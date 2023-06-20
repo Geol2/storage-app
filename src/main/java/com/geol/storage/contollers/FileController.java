@@ -32,15 +32,15 @@ public class FileController {
 		LocalDateTime DateTime = LocalDateTime.of(currentDate, currentTime);
 		String today = DateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hhmmssSSSSSS"));
 
-		ServletContext servletContext = request.getSession().getServletContext();
 		uploadDir = System.getProperty("user.dir");
 		String targetDir = "/src/main/resources/public/";
 
-
-
 		try {
 			String fileName = StringUtils.cleanPath( Objects.requireNonNull(uploadedFile.getOriginalFilename()) );
-			File targetFile = new File(uploadDir + targetDir + fileName);
+			String[] extArr = fileName.split("\\.");
+			String ext = extArr[1];
+
+			File targetFile = new File(uploadDir + targetDir + today + "." + ext);
 			uploadedFile.transferTo(targetFile);
 		} catch (RuntimeException e) {
 			System.out.println("파일 저장 중 알 수 없는 에러가 발생하였습니다.");
